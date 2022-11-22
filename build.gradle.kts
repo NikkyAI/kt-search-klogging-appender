@@ -42,6 +42,8 @@ dependencies {
     api("com.jillesvangurp:search-client-jvm:_")
     api("io.klogging:klogging-jvm:_")
 
+    // bring your own logging, but we need some in tests
+    // we don't generally want to support slf4j and MDC, but we need to..
     testImplementation("io.klogging:slf4j-klogging:_")
     testImplementation("io.github.microutils:kotlin-logging:_")
     testImplementation(KotlinX.coroutines.core)
@@ -49,12 +51,6 @@ dependencies {
     testImplementation(Testing.junit.jupiter.api)
     testImplementation(Testing.junit.jupiter.engine)
     testImplementation(Testing.kotest.assertions.core)
-    // bring your own logging, but we need some in tests
-//    testImplementation("org.slf4j:slf4j-api:_")
-//    testImplementation("org.slf4j:jcl-over-slf4j:_")
-//    testImplementation("org.slf4j:log4j-over-slf4j:_")
-//    testImplementation("org.slf4j:jul-to-slf4j:_")
-
 }
 
 tasks.withType<Test> {
@@ -81,8 +77,8 @@ tasks.withType<Test> {
     }
 }
 
-val artifactName = "kt-search-kts"
-val artifactGroup = "com.github.jillesvangurp"
+val artifactName = "kt-search-klogging-appender"
+val artifactGroup = "com.github.nikkyai"
 
 val sourceJar = task("sourceJar", Jar::class) {
     dependsOn(tasks["classes"])
@@ -101,13 +97,13 @@ publishing {
             groupId = artifactGroup
             artifactId = artifactName
             pom {
-                description.set("Kts extensions for kt-search. Easily script operations for Elasticsearch and Opensearch with .main.kts scripts")
+                description.set("log to elasticsearch datastreams with klogging")
                 name.set(artifactId)
-                url.set("https://github.com/jillesvangurp/kt-search-kts")
+                url.set("https://github.com/NikkyAI/kt-search-klogging-appender")
                 licenses {
                     license {
                         name.set("MIT")
-                        url.set("https://github.com/jillesvangurp/kt-search-kts/LICENSE")
+                        url.set("https://github.com/NikkyAI/kt-search-klogging-appender/LICENSE")
                         distribution.set("repo")
                     }
                 }
@@ -116,15 +112,24 @@ publishing {
                         id.set("jillesvangurp")
                         name.set("Jilles van Gurp")
                     }
+                    developer {
+                        id.set("NikkyAI")
+                        name.set("Nikky")
+                    }
                 }
                 scm {
-                    url.set("https://github.com/jillesvangurp/kt-search-kts/LICENSE")
+                    url.set("https://github.com/NikkyAI/kt-search-klogging-appender.git")
                 }
             }
 
             from(components["java"])
             artifact(sourceJar)
             artifact(javadocJar)
+        }
+    }
+    repositories {
+        maven {
+            url = uri("gcs://mvn-public-tryformation/releases")
         }
     }
 }
