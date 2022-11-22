@@ -70,7 +70,6 @@ class SLF4JTest() : KLoggingTest() {
             println(hits.map {it?.message})
 
             resp.total shouldBeExactly 3
-            val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
             assertSoftly {
                 hits.forEach { m ->
                     m!!
