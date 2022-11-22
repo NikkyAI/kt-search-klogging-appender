@@ -21,10 +21,9 @@ open class KLoggingTest : Klogging {
             warmMinAgeDays = 1,
             deleteMinAgeDays = 7,
             contextVariableExclude = "(exclude)".toRegex(),
-            additionalContext = mapOf(
+            context = mapOf(
                 "environment" to "tests",
-                "host" to System.getenv("HOSTNAME"),
-                "exclude" to "no!"
+                "host" to (System.getenv("HOSTNAME") ?: "")
             )
         )
 

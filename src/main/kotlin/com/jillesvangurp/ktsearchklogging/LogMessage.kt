@@ -21,7 +21,7 @@ data class LogMessage(
     /** Name of the logger that emitted the event. */
     val logger: String,
     /** Name of the thread or similar context identifier where the event was emitted. */
-    val context: String?,
+    val thread: String?,
     /** Severity [Level] of the event. */
     val level: Level,
     /** [Message template](https://messagetemplates.org), if any, used to construct the message. */
@@ -41,7 +41,7 @@ data class LogMessage(
      * hole in the template.
      */
     val items: Map<String, String> = mapOf(),
-//    val additionalContext: Map<String, String> = mapOf(),
+    val context: Map<String, String> = mapOf(),
 
 //    val message: String,
 //    val logger: String,

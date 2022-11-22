@@ -88,7 +88,7 @@ suspend fun SearchClient.manageDataStream(
             keyword(LogMessage::logger) {
                 copyTo = listOf("text")
             }
-            keyword(LogMessage::context) {
+            keyword(LogMessage::thread) {
                 copyTo = listOf("text")
             }
             keyword(LogMessage::level)
@@ -110,6 +110,7 @@ suspend fun SearchClient.manageDataStream(
                 copyTo = listOf("text")
             }
             objField(LogMessage::items, dynamic = "true") {}
+            objField(LogMessage::context, dynamic = "true") {}
         }
         meta {
             put("created_by","kt-search-klogging-appender")

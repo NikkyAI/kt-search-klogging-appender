@@ -9,6 +9,7 @@ import io.klogging.rendering.RenderString
 import io.klogging.rendering.evalTemplate
 import io.klogging.sending.SendString
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
 import kotlin.time.Duration.Companion.days
 
 class KtSearchAppender(
@@ -37,7 +38,7 @@ class KtSearchAppender(
     val warmSegments: Int = 1,
     val contextVariableFilter: Regex? = null,
     val contextVariableExclude: Regex? = null,
-    val additionalContext: Map<String, String> = emptyMap(),
+    val context: Map<String, String?> = emptyMap(),
 ) : Klogging {
     var logIndexer: LogIndexer
         private set
@@ -122,14 +123,13 @@ class KtSearchAppender(
     }
     val renderer: RenderString = { logEvent ->
         try {
-            val logMessage = logEvent.toLogMessage(contextVariableFilter, contextVariableExclude, additionalContext)
+            val logMessage = logEvent.toLogMessage(contextVariableFilter, contextVariableExclude, context)
 //            if(verbose) println("log message: $logMessage")
-//            println("log message: $logMessage")
             try {
                 DEFAULT_JSON.encodeToString(LogMessage.serializer(), logMessage)
-            } catch (e: Exception) {
+            } catch (e: SerializationException) {
 //                e.printStackTrace()
-                println("message: $logMessage")
+                println("problem serializing message: $logMessage")
                 throw e
             }
         } catch (e: Exception) {
@@ -143,9 +143,9 @@ class KtSearchAppender(
 fun LogEvent.toLogMessage(
     variableFilter: Regex?,
     variableExclude: Regex?,
-    additionalContext: Map<String, String>,
+    contextMap: Map<String, String?>,
 ): LogMessage {
-    val contextItems = items
+    val items = items
         .filter { (k, _) ->
             if (variableFilter != null) {
                 k.matches(variableFilter)
@@ -162,18 +162,21 @@ fun LogEvent.toLogMessage(
         }
         .mapValues { it.value.toString() }
 
+    val contextMap = contextMap
+        .mapValues { it.value.toString() }
+
     return LogMessage(
         id = id,
         timestamp = timestamp,
         host = host,
         logger = logger,
-        context = context,
+        thread = context,
         level = level,
         template = template,
         templateEvaluated = evalTemplate(),
         message = message,
         stackTrace = stackTrace,
-        items = contextItems + additionalContext,
-//        additionalContext = additionalContext
+        items = items,
+        context = contextMap,
     )
 }

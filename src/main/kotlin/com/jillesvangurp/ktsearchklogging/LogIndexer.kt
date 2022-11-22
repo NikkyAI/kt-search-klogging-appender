@@ -91,10 +91,10 @@ class LogIndexer(
                     while (running) {
                         try {
                             val source = eventChannel.receive()
-//                            val logMessage: JsonObject = DEFAULT_JSON.decodeFromString(JsonObject.serializer(), source)
-//                            val id = logMessage.getValue("id").jsonPrimitive.content
+                            val logMessage: JsonObject = DEFAULT_JSON.decodeFromString(JsonObject.serializer(), source)
+                            val id = logMessage.getValue("id").jsonPrimitive.content
                             receiveCount++
-                            session.create(index = index, source = source, id = null)
+                            session.create(index = index, source = source, id = id)
                         } catch (e: Exception) {
                             println("indexing error: ${e.message}")
                             e.printStackTrace()

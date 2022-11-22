@@ -72,10 +72,10 @@ class SLF4JTest() : KLoggingTest() {
             hits shouldHaveSize 3
             assertSoftly {
                 hits.forEach { m ->
-                    m.items shouldContain ("environment" to "tests")
+                    m.context shouldContain ("environment" to "tests")
                     m.items shouldContain ("runId" to "1")
                     m.items.keys shouldNotContain "exclude"
-                    m.items.keys shouldContain "host"
+                    m.context.keys shouldContain "host"
                 }
             }
         }

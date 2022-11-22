@@ -66,9 +66,9 @@ class AppenderTest: KLoggingTest() {
                 hits.first().let { m ->
                     println(m)
                     withClue("$m") {
-                        m.items shouldContain ("environment" to "tests")
+                        m.context shouldContain ("environment" to "tests")
                         m.items.keys shouldNotContain "exclude"
-                        m.items.keys shouldContain "host"
+                        m.context.keys shouldContain "host"
                     }
                 }
                 hits.first(){ it.message == "stacktrace" }.let {
