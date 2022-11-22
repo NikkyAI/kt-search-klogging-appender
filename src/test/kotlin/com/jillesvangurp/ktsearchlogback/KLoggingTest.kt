@@ -15,7 +15,7 @@ open class KLoggingTest : Klogging {
             verbose = true,
             logElasticSearchCalls = false,
             host = "localhost",
-            port = 9999,
+            port = 9292,
             createDataStream = true,
             configureIlm = true,
             hotRollOverGb = 1,
@@ -40,16 +40,6 @@ open class KLoggingTest : Klogging {
             }
             logger.info { "logging setup" }
         }
-
-//        @JvmStatic
-//        @AfterAll
-//        fun stopIndexer(): Unit {
-//            try {
-//                appender.logIndexer.stop()
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
 
         val client by lazy {
             SearchClient(

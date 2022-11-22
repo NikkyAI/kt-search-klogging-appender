@@ -7,6 +7,7 @@ import io.klogging.context.logContext
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.timing.eventually
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.longs.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeGreaterThan
@@ -65,14 +66,13 @@ class SLF4JTest() : KLoggingTest() {
             }
             resp.total shouldBeGreaterThan 0
 
-            val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
+            val hits = resp.parseHits<LogMessage>(DEFAULT_JSON).filterNotNull()
             println(resp.total)
-            println(hits.map {it?.message})
+            println(hits.map {it.message})
 
-            resp.total shouldBeExactly 3
+            hits shouldHaveSize 3
             assertSoftly {
                 hits.forEach { m ->
-                    m!!
                     m.items shouldContain ("environment" to "tests")
                     m.items shouldContain ("runId" to "1")
                     m.items.keys shouldNotContain "exclude"

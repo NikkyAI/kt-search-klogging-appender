@@ -57,21 +57,16 @@ class AppenderTest: KLoggingTest() {
                 // if our mapping is applied, we should be able to query on context.environment
                 val resp = client.search(appender.dataStreamName) {
                     resultSize = 100
-//                    query = term("items.environment", "tests")
-//                    query = term("items.test", "appender")
                     query = term("items.run", runId)
-//                    query = matchAll()
                 }
                 resp.total shouldBeGreaterThan 0
 
-                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
+                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON).filterNotNull()
                 println(resp.total)
-                println(hits.map {it?.message})
+                println(hits.map {it.message})
 
-                resp.total shouldBeExactly 5
-//                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
-//                println(hits)
-                hits.first()!!.let { m ->
+                hits shouldHaveSize 5
+                hits.first().let { m ->
                     println(m)
                     withClue("$m") {
                         m.items shouldContain ("environment" to "tests")
@@ -79,11 +74,11 @@ class AppenderTest: KLoggingTest() {
                         m.items.keys shouldContain "host"
                     }
                 }
-                hits.first(){ it?.message == "stacktrace" }!!.let {
+                hits.first(){ it.message == "stacktrace" }.let {
                     println("stacktrace: ${it.stackTrace}")
                     it.stackTrace shouldNotBe null
                 }
-                hits.mapNotNull { it?.items?.get("exclude") } shouldHaveSize 0
+                hits.mapNotNull { it.items["exclude"] } shouldHaveSize 0
             }
 
         }
