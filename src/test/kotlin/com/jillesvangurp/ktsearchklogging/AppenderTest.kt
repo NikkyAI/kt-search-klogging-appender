@@ -31,6 +31,7 @@ class AppenderTest: KLoggingTest() {
             val runId = Random.nextUInt().toString()
             withContext(logContext("test" to "appender", "run" to runId)) {
                 logger.info { "hello world" }
+                //TODO: make log function aliases to capture mdc ?
                 MDC.put("test", "value")
                 logger.error { "another one" }
                 try {
@@ -38,7 +39,8 @@ class AppenderTest: KLoggingTest() {
                 } catch (e: Exception) {
                     logger.error(e) { "stacktrace" }
                 }
-                withContext(logContext("exclude" to "THIS SHOULD NOT BE SHOWN")
+                withContext(
+                    logContext("exclude" to "THIS SHOULD NOT BE SHOWN")
                 ) {
                     logger.error { "meow" }
                 }

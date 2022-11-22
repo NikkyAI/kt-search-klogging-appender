@@ -110,9 +110,8 @@ class KtSearchAppender(
 //            if(verbose) {
 //                println("decoding: '''$line'''\n")
 //            }
-//            val logMessage: LogMessage = DEFAULT_JSON.decodeFromString(LogMessage.serializer(), line)
-
             try {
+//            val logMessage: LogMessage = DEFAULT_JSON.decodeFromString(LogMessage.serializer(), line)
                 logIndexer.eventChannel.send(line)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -122,8 +121,22 @@ class KtSearchAppender(
         }
     }
     val renderer: RenderString = { logEvent ->
-        val logMessage = logEvent.toLogMessage(contextVariableFilter, contextVariableExclude, additionalContext)
-        DEFAULT_JSON.encodeToString(LogMessage.serializer(), logMessage)
+        try {
+            val logMessage = logEvent.toLogMessage(contextVariableFilter, contextVariableExclude, additionalContext)
+//            if(verbose) println("log message: $logMessage")
+//            println("log message: $logMessage")
+            try {
+                DEFAULT_JSON.encodeToString(LogMessage.serializer(), logMessage)
+            } catch (e: Exception) {
+//                e.printStackTrace()
+                println("message: $logMessage")
+                throw e
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("rendering error: ${e.message}")
+            throw e
+        }
     }
 }
 
@@ -132,7 +145,7 @@ fun LogEvent.toLogMessage(
     variableExclude: Regex?,
     additionalContext: Map<String, String>,
 ): LogMessage {
-    val contextItems = (additionalContext + items)
+    val contextItems = items
         .filter { (k, _) ->
             if (variableFilter != null) {
                 k.matches(variableFilter)
@@ -160,6 +173,7 @@ fun LogEvent.toLogMessage(
         templateEvaluated = evalTemplate(),
         message = message,
         stackTrace = stackTrace,
-        items = contextItems,
+        items = contextItems + additionalContext,
+//        additionalContext = additionalContext
     )
 }

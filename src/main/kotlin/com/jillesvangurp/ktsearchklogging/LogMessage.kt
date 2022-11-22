@@ -41,6 +41,7 @@ data class LogMessage(
      * hole in the template.
      */
     val items: Map<String, String> = mapOf(),
+//    val additionalContext: Map<String, String> = mapOf(),
 
 //    val message: String,
 //    val logger: String,

@@ -6,6 +6,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration.Companion.seconds
 
 class LogIndexer(
@@ -89,8 +91,10 @@ class LogIndexer(
                     while (running) {
                         try {
                             val source = eventChannel.receive()
+//                            val logMessage: JsonObject = DEFAULT_JSON.decodeFromString(JsonObject.serializer(), source)
+//                            val id = logMessage.getValue("id").jsonPrimitive.content
                             receiveCount++
-                            session.create(index = index, source = source)
+                            session.create(index = index, source = source, id = null)
                         } catch (e: Exception) {
                             println("indexing error: ${e.message}")
                             e.printStackTrace()
