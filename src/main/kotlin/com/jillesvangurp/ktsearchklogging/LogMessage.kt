@@ -33,7 +33,7 @@ data class LogMessage(
      *  String stack trace information that may be included if an error or exception is
      *  associated with the event.
      */
-    val stackTrace: String? = null,
+    val exception: LogException? = null,
     /**
      * Map of items current at the time of the event, to be displayed as structured data.
      *
@@ -57,7 +57,7 @@ data class LogMessage(
 )
 
 @Serializable
-data class LogException(val className: String, val message: String, val stackTrace: List<String>?)
+data class LogException(val className: String, val message: String, val stackTrace: String)
 
 //fun IThrowableProxy?.toLogException(): List<LogException>? {
 //    return this?.let {

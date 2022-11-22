@@ -165,6 +165,15 @@ fun LogEvent.toLogMessage(
     val contextMap = contextMap
         .mapValues { it.value.toString() }
 
+    val exception = stackTrace?.let { stacktrace ->
+        val lines = stacktrace.lines()
+        LogException(
+            className = lines.first().substringBefore(":"),
+            message = lines.first().substringAfter(":"),
+            stackTrace = stacktrace
+        )
+    }
+
     return LogMessage(
         id = id,
         timestamp = timestamp,
@@ -174,7 +183,7 @@ fun LogEvent.toLogMessage(
         level = level,
         template = template,
         message = evalTemplate(),
-        stackTrace = stackTrace,
+        exception = exception,
         items = items,
         context = contextMap,
     )

@@ -106,8 +106,15 @@ suspend fun SearchClient.manageDataStream(
                 }
                 copyTo = listOf("text")
             }
-            text(LogMessage::stackTrace) {
-                copyTo = listOf("text")
+            objField(LogMessage::exception) {
+                keyword(LogException::className) {
+                    ignoreAbove="256"
+                    copyTo = listOf("text")
+                }
+                text(LogException::message) {
+                    copyTo = listOf("text")
+                }
+                text(LogException::stackTrace)
             }
             objField(LogMessage::items, dynamic = "true") {}
             objField(LogMessage::context, dynamic = "true") {}
