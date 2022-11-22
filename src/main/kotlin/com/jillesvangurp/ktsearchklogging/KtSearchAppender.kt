@@ -132,8 +132,6 @@ fun LogEvent.toLogMessage(
     variableExclude: Regex?,
     additionalContext: Map<String, String>,
 ): LogMessage {
-
-    println("original items: $items")
     val contextItems = (additionalContext + items)
         .filter { (k, _) ->
             if (variableFilter != null) {
