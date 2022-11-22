@@ -14,7 +14,7 @@ import it.krzeminski.githubactions.dsl.workflow
 import it.krzeminski.githubactions.yaml.writeToFile
 
 val workflow = workflow(
-    name = "CI",
+    name = "Run tests",
     on = listOf(
         Push(
             branches = listOf("main")
