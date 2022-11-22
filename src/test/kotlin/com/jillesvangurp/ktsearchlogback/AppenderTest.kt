@@ -1,56 +1,87 @@
 package com.jillesvangurp.ktsearchlogback
 
 import com.jillesvangurp.ktsearch.*
+import com.jillesvangurp.searchdsls.querydsl.matchAll
 import com.jillesvangurp.searchdsls.querydsl.term
+import io.klogging.context.logContext
 import io.kotest.assertions.timing.eventually
+import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.contain
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.longs.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeGreaterThan
+import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.shouldNot
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import java.lang.Exception
+import kotlin.random.Random
+import kotlin.random.nextUInt
 import kotlin.time.Duration.Companion.seconds
 
 val logger = KotlinLogging.logger {}
 
-class AppenderTest {
+class AppenderTest: KLoggingTest() {
     @Test
     fun shouldLogSomeStuff() {
         runBlocking {
-            logger.info { "hello world" }
-            MDC.put("test", "value")
-            logger.error { "another one" }
-            try {
-                error("oopsie")
-            } catch (e: Exception) {
-                logger.error(e) { "stacktrace" }
+            val runId = Random.nextUInt().toString()
+            withContext(logContext("test" to "appender", "run" to runId)) {
+                logger.info { "hello world" }
+                MDC.put("test", "value")
+                logger.error { "another one" }
+                try {
+                    error("oopsie")
+                } catch (e: Exception) {
+                    logger.error(e) { "stacktrace" }
+                }
+                withContext(logContext("exclude" to "THIS SHOULD NOT BE SHOWN")
+                ) {
+                    logger.error { "meow" }
+                }
+                logger.warn { "last one" }
             }
-            logger.warn { "last one" }
             delay(1.seconds)
 
-            val client = SearchClient(KtorRestClient("localhost",9999))
-            eventually(20.seconds) {
+            eventually(15.seconds) {
                 // should not throw because the data stream was created
-                client.getIndexMappings("applogs")
+                client.getIndexMappings(appender.dataStreamName)
                 // if our mapping is applied, we should be able to query on context.environment
-                val resp = client.search("applogs") {
-                    resultSize=100
-                    query = term("context.environment", "tests")
+                val resp = client.search(appender.dataStreamName) {
+                    resultSize = 100
+//                    query = term("items.environment", "tests")
+//                    query = term("items.test", "appender")
+                    query = term("items.run", runId)
+//                    query = matchAll()
                 }
-                resp.total shouldBeGreaterThan 2
+                println(resp.total)
                 val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
-                hits.first().let { m ->
-                    (m?.context?.keys ?: setOf()) shouldContain "host"
-                    (m?.context?.keys ?: setOf()) shouldNot contain("exclude")
+
+                println(hits.map {it?.message})
+                resp.total shouldBeExactly 5
+//                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
+//                println(hits)
+                hits.first()!!.let { m ->
+                    println(m)
+                    withClue("$m") {
+                        m.items shouldContain ("environment" to "tests")
+                        m.items.keys shouldNotContain "exclude"
+                        m.items.keys shouldContain "host"
+                    }
                 }
-                hits.first(){it?.message == "stacktrace"}?.let {
-                    (it.exceptionList?.first()?.stackTrace?.size?:-1) shouldBeGreaterThan 1
+                hits.first(){ it?.message == "stacktrace" }!!.let {
+                    println("stacktrace: ${it.stackTrace}")
+                    it.stackTrace shouldNotBe null
                 }
+                hits.mapNotNull { it?.items?.get("exclude") } shouldHaveSize 0
             }
 
         }

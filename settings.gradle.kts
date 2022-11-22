@@ -13,4 +13,4 @@ plugins {
 refreshVersions {
 }
 
-rootProject.name = "kt-search-logback-appender"
+rootProject.name = "kt-search-klogging-appender"

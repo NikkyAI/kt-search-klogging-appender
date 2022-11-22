@@ -33,25 +33,27 @@ configure<ComposeExtension> {
     removeContainers.set(true)
     forceRecreate.set(true)
     useComposeFiles.set(listOf("docker-compose-es-7.yml"))
+    setProjectName("kt_search_klogging_test")
 }
 
 dependencies {
     api(Kotlin.stdlib.jdk8)
     // use -jvm dependencies here because otherwise kts fails to fetch
     api("com.jillesvangurp:search-client-jvm:_")
-    api("io.github.microutils:kotlin-logging:_")
-    api("ch.qos.logback:logback-classic:_")
+    api("io.klogging:klogging-jvm:_")
 
-
-
+    testImplementation("io.klogging:slf4j-klogging:_")
+    testImplementation("io.github.microutils:kotlin-logging:_")
+    testImplementation(KotlinX.coroutines.core)
+    testImplementation(KotlinX.coroutines.test)
     testImplementation(Testing.junit.jupiter.api)
     testImplementation(Testing.junit.jupiter.engine)
     testImplementation(Testing.kotest.assertions.core)
     // bring your own logging, but we need some in tests
-    testImplementation("org.slf4j:slf4j-api:_")
-    testImplementation("org.slf4j:jcl-over-slf4j:_")
-    testImplementation("org.slf4j:log4j-over-slf4j:_")
-    testImplementation("org.slf4j:jul-to-slf4j:_")
+//    testImplementation("org.slf4j:slf4j-api:_")
+//    testImplementation("org.slf4j:jcl-over-slf4j:_")
+//    testImplementation("org.slf4j:log4j-over-slf4j:_")
+//    testImplementation("org.slf4j:jul-to-slf4j:_")
 
 }
 
@@ -63,9 +65,7 @@ tasks.withType<Test> {
         false
     }
     if (!isUp) {
-        dependsOn(
-            "composeUp"
-        )
+        dependsOn("composeUp")
     }
     useJUnitPlatform()
     testLogging.exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL

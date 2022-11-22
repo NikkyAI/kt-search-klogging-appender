@@ -13,9 +13,10 @@ class LogIndexer(
     private val index: String,
     private val bulkMaxPageSize: Int,
     private val flushSeconds: Int,
+    private val verbose: Boolean = false,
 ) {
     private var session: BulkSession
-    internal val eventChannel = Channel<LogMessage>(
+    internal val eventChannel = Channel<String>(
         capacity = 1000,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
@@ -87,9 +88,9 @@ class LogIndexer(
                 try {
                     while (running) {
                         try {
-                            val e = eventChannel.receive()
+                            val source = eventChannel.receive()
                             receiveCount++
-                            session.create(index=index,doc = e)
+                            session.create(index = index, source = source)
                         } catch (e: Exception) {
                             println("indexing error: ${e.message}")
                             e.printStackTrace()
@@ -117,6 +118,6 @@ class LogIndexer(
             flushJob.cancel()
         }
         indexJob.cancel()
-        println("closed es logback appender: received: $receiveCount, indexed:$successCount, failed: $failCount, errors: $errorCount")
+        println("closed es klogging appender: received: $receiveCount, indexed:$successCount, failed: $failCount, errors: $errorCount")
     }
 }
