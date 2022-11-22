@@ -9,6 +9,7 @@ import io.kotest.assertions.timing.eventually
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.longs.shouldBeExactly
+import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldContain
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -62,7 +63,12 @@ class SLF4JTest() : KLoggingTest() {
                 resultSize = 100
                 query = term("items.run", runId)
             }
+            resp.total shouldBeGreaterThan 0
+
+            val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
             println(resp.total)
+            println(hits.map {it?.message})
+
             resp.total shouldBeExactly 3
             val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
             assertSoftly {

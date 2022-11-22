@@ -62,10 +62,12 @@ class AppenderTest: KLoggingTest() {
                     query = term("items.run", runId)
 //                    query = matchAll()
                 }
-                println(resp.total)
-                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
+                resp.total shouldBeGreaterThan 0
 
+                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
+                println(resp.total)
                 println(hits.map {it?.message})
+
                 resp.total shouldBeExactly 5
 //                val hits = resp.parseHits<LogMessage>(DEFAULT_JSON)
 //                println(hits)
