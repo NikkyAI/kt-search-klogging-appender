@@ -37,7 +37,7 @@ class AppenderTest: KLoggingTest() {
                 try {
                     error("oopsie")
                 } catch (e: Exception) {
-                    logger.error(e) { "stacktrace" }
+                    logger.error(e) { "exception" }
                 }
                 withContext(
                     logContext("exclude" to "THIS SHOULD NOT BE SHOWN")
@@ -71,9 +71,9 @@ class AppenderTest: KLoggingTest() {
                         m.context.keys shouldContain "host"
                     }
                 }
-                hits.first(){ it.message == "stacktrace" }.let {
-                    println("stacktrace: ${it.stackTrace}")
-                    it.stackTrace shouldNotBe null
+                hits.first(){ it.message == "exception" }.let {
+                    println("exception: ${it.exception}")
+                    it.exception shouldNotBe null
                 }
                 hits.mapNotNull { it.items["exclude"] } shouldHaveSize 0
             }
