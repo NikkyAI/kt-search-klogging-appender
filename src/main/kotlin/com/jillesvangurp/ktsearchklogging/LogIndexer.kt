@@ -1,4 +1,4 @@
-package com.jillesvangurp.ktsearchlogback
+package com.jillesvangurp.ktsearchklogging
 
 import com.jillesvangurp.ktsearch.*
 import kotlinx.coroutines.*

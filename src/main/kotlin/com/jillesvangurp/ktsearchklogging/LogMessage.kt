@@ -1,9 +1,8 @@
-package com.jillesvangurp.ktsearchlogback
+package com.jillesvangurp.ktsearchklogging
 
 import io.klogging.Level
 import io.klogging.events.*
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

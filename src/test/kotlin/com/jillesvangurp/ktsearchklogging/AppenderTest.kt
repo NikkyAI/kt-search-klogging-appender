@@ -1,20 +1,15 @@
-package com.jillesvangurp.ktsearchlogback
+package com.jillesvangurp.ktsearchklogging
 
 import com.jillesvangurp.ktsearch.*
-import com.jillesvangurp.searchdsls.querydsl.matchAll
 import com.jillesvangurp.searchdsls.querydsl.term
 import io.klogging.context.logContext
 import io.kotest.assertions.timing.eventually
 import io.kotest.assertions.withClue
-import io.kotest.matchers.collections.contain
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotContain
-import io.kotest.matchers.ints.shouldBeGreaterThan
-import io.kotest.matchers.longs.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldContain
-import io.kotest.matchers.shouldNot
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

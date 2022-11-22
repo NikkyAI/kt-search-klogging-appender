@@ -1,4 +1,4 @@
-package com.jillesvangurp.ktsearchlogback
+package com.jillesvangurp.ktsearchklogging
 
 import com.jillesvangurp.ktsearch.KtorRestClient
 import com.jillesvangurp.ktsearch.SearchClient
@@ -6,7 +6,6 @@ import io.klogging.Klogging
 import io.klogging.Level
 import io.klogging.config.DEFAULT_CONSOLE
 import io.klogging.config.loggingConfiguration
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 
 open class KLoggingTest : Klogging {

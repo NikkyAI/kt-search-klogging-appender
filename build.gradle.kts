@@ -27,6 +27,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
 configure<ComposeExtension> {
     buildAdditionalArgs.set(listOf("--force-rm"))
     stopContainers.set(true)

@@ -1,4 +1,4 @@
-package com.jillesvangurp.ktsearchlogback
+package com.jillesvangurp.ktsearchklogging
 
 import io.klogging.context.logContext
 import org.slf4j.MDC
