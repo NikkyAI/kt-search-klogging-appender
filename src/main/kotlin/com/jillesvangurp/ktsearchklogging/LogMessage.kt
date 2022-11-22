@@ -26,7 +26,7 @@ data class LogMessage(
     val level: Level,
     /** [Message template](https://messagetemplates.org), if any, used to construct the message. */
     val template: String? = null,
-    val templateEvaluated: String? = null,
+//    val templateEvaluated: String? = null,
     /** Message describing the event. */
     val message: String,
     /**

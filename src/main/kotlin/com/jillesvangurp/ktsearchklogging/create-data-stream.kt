@@ -95,9 +95,9 @@ suspend fun SearchClient.manageDataStream(
             text(LogMessage::template) {
                 copyTo = listOf("text")
             }
-            text(LogMessage::templateEvaluated) {
-                copyTo = listOf("text")
-            }
+//            text(LogMessage::templateEvaluated) {
+//                copyTo = listOf("text")
+//            }
             text(LogMessage::message) {
                 fields {
                     keyword("keyword") {
