@@ -61,7 +61,7 @@ class SLF4JTest() : KLoggingTest() {
             // if our mapping is applied, we should be able to query on context.environment
             val resp = client.search(appender.dataStreamName) {
                 resultSize = 100
-                query = term("items.run", runId)
+                query = term("mdc.run", runId)
             }
             resp.total shouldBeGreaterThan 0
 
@@ -73,8 +73,8 @@ class SLF4JTest() : KLoggingTest() {
             assertSoftly {
                 hits.forEach { m ->
                     m.context shouldContain ("environment" to "tests")
-                    m.items shouldContain ("runId" to "1")
-                    m.items.keys shouldNotContain "exclude"
+                    m.mdc shouldContain ("runId" to "1")
+                    m.mdc.keys shouldNotContain "exclude"
                     m.context.keys shouldContain "host"
                 }
             }

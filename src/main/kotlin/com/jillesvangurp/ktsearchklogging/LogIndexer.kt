@@ -46,11 +46,13 @@ class LogIndexer(
                     // do some bookkeeping so you can know when you are losing messages
                     callBack = object : BulkItemCallBack {
                         override fun bulkRequestFailed(e: Exception, ops: List<Pair<String, String?>>) {
+                            println("bulkRequest failed ${e.message}")
                             e.printStackTrace()
                             errorCount++
                         }
 
                         override fun itemFailed(operationType: OperationType, item: BulkResponse.ItemDetails) {
+                            println("bulkItem failed ${operationType.name}")
                             failCount++
                         }
 
@@ -91,17 +93,15 @@ class LogIndexer(
                     while (running) {
                         try {
                             val source = eventChannel.receive()
-                            val logMessage: JsonObject = DEFAULT_JSON.decodeFromString(JsonObject.serializer(), source)
-                            val id = logMessage.getValue("id").jsonPrimitive.content
                             receiveCount++
-                            session.create(index = index, source = source, id = id)
+                            session.create(index = index, source = source)
                         } catch (e: Exception) {
                             println("indexing error: ${e.message}")
                             e.printStackTrace()
                         }
                     }
                 } catch (e: Exception) {
-                    println("Logback appender session create loop exiting abnormally ${e.message}")
+                    println("klogging appender session create loop exiting abnormally ${e.message}")
                     e.printStackTrace()
                 }
             }

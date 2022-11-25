@@ -17,7 +17,8 @@ import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
-import java.lang.Exception
+import java.lang.IllegalArgumentException
+import kotlin.Exception
 import kotlin.random.Random
 import kotlin.random.nextUInt
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +36,13 @@ class AppenderTest: KLoggingTest() {
                 MDC.put("test", "value")
                 logger.error { "another one" }
                 try {
-                    error("oopsie")
+                    try {
+                        while (true) {
+                            error("oopsie")
+                        }
+                    } catch (e: Exception) {
+                        throw IllegalArgumentException("some exception", e)
+                    }
                 } catch (e: Exception) {
                     logger.error(e) { "exception" }
                 }
@@ -54,7 +61,7 @@ class AppenderTest: KLoggingTest() {
                 // if our mapping is applied, we should be able to query on context.environment
                 val resp = client.search(appender.dataStreamName) {
                     resultSize = 100
-                    query = term("items.run", runId)
+                    query = term("mdc.run", runId)
                 }
                 resp.total shouldBeGreaterThan 0
 
@@ -67,15 +74,18 @@ class AppenderTest: KLoggingTest() {
                     println(m)
                     withClue("$m") {
                         m.context shouldContain ("environment" to "tests")
-                        m.items.keys shouldNotContain "exclude"
+                        m.mdc.keys shouldNotContain "exclude"
                         m.context.keys shouldContain "host"
                     }
                 }
-                hits.first(){ it.message == "exception" }.let {
-                    println("exception: ${it.exception}")
-                    it.exception shouldNotBe null
+                hits.first { it.message == "exception" }.let { m ->
+                    println("exception: ${m.exceptionList}")
+                    m.exceptionList shouldNotBe null
+                    m.exceptionList?.let { exceptionList ->
+                        exceptionList shouldHaveSize 2
+                    }
                 }
-                hits.mapNotNull { it.items["exclude"] } shouldHaveSize 0
+                hits.mapNotNull { it.mdc["exclude"] } shouldHaveSize 0
             }
 
         }

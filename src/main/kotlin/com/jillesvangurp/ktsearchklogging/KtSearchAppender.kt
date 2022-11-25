@@ -58,7 +58,6 @@ class KtSearchAppender(
         runBlocking {
 
             log("starting")
-//        super.start()
             log("connecting to $host:$port using ssl $ssl with user: $userName and password: ${password?.map { 'x' }}")
             if (createDataStream) {
                 runBlocking {
@@ -101,34 +100,26 @@ class KtSearchAppender(
 
     private suspend fun log(message: String) {
         if (verbose) {
-//            logger.info { message }
             println("kt-search_klogging-appender: $message")
         }
     }
 
     val sender: SendString = { s ->
         s.lines().filterNot { it.isBlank() }.forEach { line ->
-//            if(verbose) {
-//                println("decoding: '''$line'''\n")
-//            }
             try {
-//            val logMessage: LogMessage = DEFAULT_JSON.decodeFromString(LogMessage.serializer(), line)
                 logIndexer.eventChannel.send(line)
             } catch (e: Exception) {
                 e.printStackTrace()
                 error("failed to send $line")
             }
-//            logIndexer.eventChannel.trySend(line)
         }
     }
     val renderer: RenderString = { logEvent ->
         try {
             val logMessage = logEvent.toLogMessage(contextVariableFilter, contextVariableExclude, context)
-//            if(verbose) println("log message: $logMessage")
             try {
                 DEFAULT_JSON.encodeToString(LogMessage.serializer(), logMessage)
             } catch (e: SerializationException) {
-//                e.printStackTrace()
                 println("problem serializing message: $logMessage")
                 throw e
             }
@@ -138,53 +129,4 @@ class KtSearchAppender(
             throw e
         }
     }
-}
-
-fun LogEvent.toLogMessage(
-    variableFilter: Regex?,
-    variableExclude: Regex?,
-    contextMap: Map<String, String?>,
-): LogMessage {
-    val items = items
-        .filter { (k, _) ->
-            if (variableFilter != null) {
-                k.matches(variableFilter)
-            } else {
-                true
-            }
-        }
-        .filter { (k, _) ->
-            if (variableExclude != null) {
-                !k.matches(variableExclude)
-            } else {
-                true
-            }
-        }
-        .mapValues { it.value.toString() }
-
-    val contextMap = contextMap
-        .mapValues { it.value.toString() }
-
-    val exception = stackTrace?.let { stacktrace ->
-        val lines = stacktrace.lines()
-        LogException(
-            className = lines.first().substringBefore(":"),
-            message = lines.first().substringAfter(":"),
-            stackTrace = stacktrace
-        )
-    }
-
-    return LogMessage(
-        id = id,
-        timestamp = timestamp,
-        host = host,
-        logger = logger,
-        thread = context,
-        level = level,
-        template = template,
-        message = evalTemplate(),
-        exception = exception,
-        items = items,
-        context = contextMap,
-    )
 }

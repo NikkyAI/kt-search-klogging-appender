@@ -82,22 +82,14 @@ suspend fun SearchClient.manageDataStream(
         }
         mappings(false) {
             text("text")
-            keyword(LogMessage::id)
-            date("@timestamp")
-            keyword(LogMessage::host)
-            keyword(LogMessage::logger) {
-                copyTo = listOf("text")
-            }
-            keyword(LogMessage::thread) {
-                copyTo = listOf("text")
-            }
-            keyword(LogMessage::level)
             text(LogMessage::template) {
+                fields {
+                    keyword("keyword") {
+                        ignoreAbove="256"
+                    }
+                }
                 copyTo = listOf("text")
             }
-//            text(LogMessage::templateEvaluated) {
-//                copyTo = listOf("text")
-//            }
             text(LogMessage::message) {
                 fields {
                     keyword("keyword") {
@@ -106,18 +98,26 @@ suspend fun SearchClient.manageDataStream(
                 }
                 copyTo = listOf("text")
             }
-            objField(LogMessage::exception) {
+            date("@timestamp")
+            keyword(LogMessage::thread)
+            keyword(LogMessage::level)
+            keyword(LogMessage::logger) {
+                copyTo = listOf("text")
+            }
+            objField(LogMessage::mdc, dynamic = "true") {
+            }
+            objField(LogMessage::context, dynamic = "true") {
+            }
+            keyword(LogMessage::contextName)
+            objField(LogMessage::exceptionList) {
                 keyword(LogException::className) {
                     ignoreAbove="256"
                     copyTo = listOf("text")
                 }
-                text(LogException::message) {
+                text(LogMessage::message) {
                     copyTo = listOf("text")
                 }
-                text(LogException::stackTrace)
             }
-            objField(LogMessage::items, dynamic = "true") {}
-            objField(LogMessage::context, dynamic = "true") {}
         }
         meta {
             put("created_by","kt-search-klogging-appender")
